@@ -51,7 +51,7 @@ var (
 		"yaml": YAMLUnmarshalFile{},
 		"toml": TOMLUnmarshalFile{},
 	}
-	mMutex *sync.RWMutex
+	mMutex sync.RWMutex
 )
 
 //UnmarshalMethodsAdd 添加解析器
