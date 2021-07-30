@@ -11,7 +11,7 @@ import (
 )
 
 type UnmarshalFiler interface {
-	UnmarshalFile(fileName string, result interface{}) error
+	UnmarshalFile(fileName string, v interface{}) error
 }
 
 type JSONUnmarshalFile struct{}
@@ -67,7 +67,7 @@ func UnmarshalMethodsAdd(deName string, de UnmarshalFiler) error {
 
 //UnmarshalMethodsGet 添加解析器
 func UnmarshalMethodsGet(deName string) (UnmarshalFiler, error) {
-	mMutex.RLocker()
+	mMutex.RLock()
 	defer mMutex.RUnlock()
 	if v, ok := unmarshalMethods[deName]; ok {
 		return v.(UnmarshalFiler), nil
@@ -76,18 +76,20 @@ func UnmarshalMethodsGet(deName string) (UnmarshalFiler, error) {
 }
 
 //UnmarshalFile 配置文件格式解析
+//列：config.UnmarshalFile("./fileName.json", &data)
+//会根据文件名称中的.json判定需要什么类型解析器
 func UnmarshalFile(fileName string, v interface{}) error {
 	if fileName == "" {
 		return errors.New("the file name cannot be empty")
 	}
 
-	fileNameStrs := strings.Split(fileName, ".")
+	fileNameStrs := strings.Split(strings.Trim(fileName, "."), ".")
 
 	if len(fileNameStrs) <= 1 {
 		return errors.New("incorrect file name")
 	}
 
-	unmarshalFiler, err := UnmarshalMethodsGet(fileNameStrs[1])
+	unmarshalFiler, err := UnmarshalMethodsGet(fileNameStrs[len(fileNameStrs)-1])
 	if err != nil {
 		return err
 	}
