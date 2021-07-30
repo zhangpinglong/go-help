@@ -85,3 +85,12 @@ func NowAddDurationUnix(s string) (int64, error) {
 	}
 	return time.Now().Add(dur).Unix(), err
 }
+
+//NowUntilLayout 返回当前和d的差值
+func NowUntilLayout(d string, layout string) (time.Duration, error) {
+	t, err := time.ParseInLocation(layout, d, loc)
+	if err != nil {
+		return 0, err
+	}
+	return time.Until(t), err
+}
