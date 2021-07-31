@@ -33,10 +33,18 @@ type YamlFile struct {
 
 func TestUnmarshalFile(t *testing.T) {
 	data := new(JsonFile)
-	err := UnmarshalFile("./tsconfig.json", data)
+	err := DecodeFile("./tsconfig.json", data, "json")
 	fmt.Println(err, data)
 
 	yamlData := new(YamlFile)
-	err = UnmarshalFile("./testyaml.yaml", yamlData)
+	err = DecodeFile("./testyaml.yaml", yamlData, "yaml")
 	fmt.Println(err, yamlData)
+}
+
+func BenchmarkStdJsonUnmarshalFile(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		data := new(JsonFile)
+		_ = DecodeFile("./tsconfig.json", data, "json")
+	}
 }
