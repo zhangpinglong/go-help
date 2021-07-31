@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/BurntSushi/toml"
@@ -31,7 +32,9 @@ func (YAMLUnmarshalFile) UnmarshalFile(fileName string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return yaml.Unmarshal(d, v)
+	yamlDecoder := yaml.NewDecoder(bytes.NewReader(d))
+	yamlDecoder.KnownFields(true)
+	return yamlDecoder.Decode(v)
 }
 
 type TOMLUnmarshalFile struct{}

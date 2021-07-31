@@ -1,0 +1,12 @@
+server:
+  hostPort: 0.0.0.0:9082
+  bkPort: 0.0.0.0:8083
+  webPort: 0.0.0.0:9085
+  websslPort: 0.0.0.0:9084
+  agentPort: 0.0.0.0:9084
+  centerPort: 0.0.0.0:9084
+  pnsslPort: 0.0.0.0:9084
+  pnPort: 0.0.0.0:9084
+  debug: debug
+  accessLog: 0.0.0.0
+  doc: true
