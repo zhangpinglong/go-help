@@ -1,4 +1,4 @@
-package encoding
+package types
 
 import (
 	"fmt"
@@ -31,4 +31,24 @@ func (j Json) DecodeFile(filePath string, v interface{}) error {
 
 func (j Json) DecodeStr(str string, v interface{}) error {
 	return j.jsonIns.UnmarshalFromString(str, v)
+}
+
+func (j Json) DecodeByte(b []byte, v interface{}) error {
+	return j.jsonIns.Unmarshal(b, v)
+}
+
+func (j Json) EncodeStr(b interface{}) (result string, err error) {
+	r, err := j.jsonIns.Marshal(b)
+	if err != nil {
+		return "", fmt.Errorf("json encode str err:%s", err)
+	}
+	return string(r), nil
+}
+
+func (j Json) EncodeBytes(b interface{}) (result []byte, err error) {
+	r, err := j.jsonIns.Marshal(b)
+	if err != nil {
+		return []byte{}, fmt.Errorf("json encode bytes err:%s", err)
+	}
+	return r, nil
 }
