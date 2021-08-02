@@ -1,54 +1,78 @@
 package types
 
 import (
+	"bytes"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
+	"go-help/encode"
+	"io"
 	"os"
 )
 
-type Json struct {
-	jsonIns jsoniter.API
+type jsonType struct {
 }
 
-func NewJson() Json {
-	return Json{
-		jsonIns: jsoniter.ConfigCompatibleWithStandardLibrary,
-	}
+var (
+	Json    encode.Decoder = jsonType{}
+	jsonLib                = jsoniter.ConfigCompatibleWithStandardLibrary
+)
+
+func (jsonType) UnmarshalFromReader(b io.Reader, v interface{}) error {
+	return jsonLib.NewDecoder(b).Decode(v)
 }
 
-func (j Json) DecodeFile(filePath string, v interface{}) error {
-	file, err := os.Open(filePath)
+func (jsonType) UnmarshalFromFile(fileName string, v interface{}) error {
+	file, err := os.Open(fileName)
 	if err != nil {
 		return fmt.Errorf("json decode file err:%s", err)
 	}
 
-	err = j.jsonIns.NewDecoder(file).Decode(v)
+	defer file.Close()
+
+	err = jsonLib.NewDecoder(file).Decode(v)
 	if err != nil {
 		return fmt.Errorf("json decode file err:%s", err)
 	}
 	return nil
 }
 
-func (j Json) DecodeStr(str string, v interface{}) error {
-	return j.jsonIns.UnmarshalFromString(str, v)
+func (jsonType) Unmarshal(b []byte, v interface{}) error {
+	return jsonLib.Unmarshal(b, v)
 }
 
-func (j Json) DecodeByte(b []byte, v interface{}) error {
-	return j.jsonIns.Unmarshal(b, v)
+func (jsonType) UnmarshalStr(str string, v interface{}) error {
+	return jsonLib.UnmarshalFromString(str, v)
 }
 
-func (j Json) EncodeStr(b interface{}) (result string, err error) {
-	r, err := j.jsonIns.Marshal(b)
+func (jsonType) Marshal(b interface{}) (result []byte, err error) {
+	return jsonLib.Marshal(b)
+}
+
+func (jsonType) MarshalStr(b interface{}) (result string, err error) {
+	r, err := jsonLib.MarshalToString(b)
 	if err != nil {
 		return "", fmt.Errorf("json encode str err:%s", err)
 	}
-	return string(r), nil
+	return r, nil
 }
 
-func (j Json) EncodeBytes(b interface{}) (result []byte, err error) {
-	r, err := j.jsonIns.Marshal(b)
+func (jsonType) MarshalToReader(b interface{}) (result io.Reader, err error) {
+	d, err := jsonLib.Marshal(b)
 	if err != nil {
-		return []byte{}, fmt.Errorf("json encode bytes err:%s", err)
+		return nil, fmt.Errorf("json marshal reader err:%s", err)
 	}
-	return r, nil
+	return bytes.NewReader(d), nil
+}
+
+func (jsonType) MarshalToFile(fileName string, v interface{}) error {
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("json marshal file err:%s", err)
+	}
+	defer file.Close()
+	return jsonLib.NewEncoder(file).Encode(v)
+}
+
+func (jsonType) MarshalToWriter(w io.Writer, v interface{}) error {
+	return jsonLib.NewEncoder(w).Encode(v)
 }
