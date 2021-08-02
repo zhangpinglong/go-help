@@ -10,8 +10,8 @@ import (
 
 type File struct {
 	//文件路径
-	FilePath string
-
+	FileName string
+	//to V
 	V interface{}
 	//类型名称
 	DeName string
@@ -91,4 +91,14 @@ func DecodeStr(str string, v interface{}, deName string) error {
 	}
 
 	return decoder.DecodeStr(str, v)
+}
+
+func DecodeFiles(files []File) error {
+	for _, file := range files {
+		err := DecodeFile(file.FileName, file.V, file.DeName)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
